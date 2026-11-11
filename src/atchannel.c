@@ -739,9 +739,17 @@ static int at_send_command_full_nolock (const char *command, ATCommandType type,
     TickType_t deadline = 0;
 #endif
 
-    if(sp_response != NULL) {
-        err = AT_ERROR_COMMAND_PENDING;
-        goto error;
+    if (sp_response != NULL) {
+        /* Another task currently owns the channel. Return without touching
+           sp_response: the old "goto error" path called clearPendingCommand()
+           here, which freed the *other* transaction's response object. That
+           task then lost its final "OK" (it was treated as unsolicited) and
+           blocked until its full timeout - on this port that delayed the SIM
+           initialisation by 15 s whenever the application issued an AT
+           command (AT+QCCID / AT+CSQ) at the same time.
+           AOSP never hits this because Android has a single writer thread. */
+        RLOGV("AT channel busy, command not sent: %s", command);
+        return AT_ERROR_COMMAND_PENDING;
     }
 
     s_type = type;
