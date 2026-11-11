@@ -1,0 +1,10 @@
+# Quectel vendor documentation is not distributed with this component.
+docs/*.pdf
+
+# Build output
+build/
+*.o
+*.obj
+*.a
+sdkconfig
+sdkconfig.old

@@ -1,0 +1,75 @@
+menu "esp32 cellular (reference-ril + PPP)"
+
+    config ESP32_RIL_AT_USB_ITF
+        int "USB CDC interface number for the reference-ril AT channel"
+        range 0 15
+        default 3
+        help
+            Quectel ECx00Z/EC801E/EG800Z: interface 3 is the dedicated AT
+            interface (bInterfaceClass 0xFF, bulk IN/OUT).
+
+    config ESP32_PPP_USB_ITF
+        int "USB CDC interface number for PPP data"
+        range 0 15
+        default 4
+        help
+            Quectel ECx00Z/EC801E/EG800Z: interface 4 is the Modem interface
+            used for PPP (separate from the AT interface).
+
+    config ESP32_PPP_APN
+        string "PPP APN"
+        default "cmnet"
+
+    config ESP32_PPP_USERNAME
+        string "PPP user name (optional)"
+        default ""
+
+    config ESP32_PPP_PASSWORD
+        string "PPP password (optional)"
+        default ""
+
+    config ESP32_MODEM_PWRKEY_GPIO
+        int "M_PWRKEY GPIO (idle high, low pulse to power on)"
+        range -1 48
+        default 42
+        help
+            X10 (ESP32-P4): GPIO42 = M_PWRKEY. Idle high, drive low for
+            ESP32_MODEM_PWRKEY_MS to power the module on.
+            Set to -1 on boards without a power-key line.
+
+    config ESP32_MODEM_PWRKEY_MS
+        int "M_PWRKEY low pulse width (ms)"
+        default 500
+
+    config ESP32_MODEM_VBAT_GPIO
+        int "M_VBAT_EN GPIO (active high)"
+        range -1 48
+        default 43
+        help
+            X10 (ESP32-P4): GPIO43 = M_VBAT_EN, module power enable,
+            active high. Set to -1 on boards that power the module
+            permanently.
+
+    config ESP32_MODEM_VBAT_OFF_MS
+        int "M_VBAT_EN off time during power cycle (ms)"
+        default 1000
+
+    config ESP32_MODEM_BOOT_WAIT_MS
+        int "Wait after M_PWRKEY pulse (ms)"
+        default 8000
+        help
+            Typical module Ton-status is around 8 seconds.
+
+    config ESP32_MODEM_LOG_RESET_REASON
+        bool "Log the MCU reset reason at modem bring-up"
+        default y
+
+    config ESP32_RIL_AT_LOG
+        bool "Log AT commands and responses on the USB AT channel"
+        default n
+        help
+            Prints every AT command/response (atchannel RLOGD upgraded to
+            ESP_LOGI). Useful to verify that reference-ril is really talking
+            to the USB modem.
+
+endmenu
